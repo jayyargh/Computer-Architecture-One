@@ -5,6 +5,10 @@
 // must use 0b in front of binary numbers
 // LDI register immediate
 const LDI = 0b10011001;
+// PRN register - pseudo instruction
+const PRN = 0b01000011;
+// HLT - halt the CPU (and exit the emulator)
+const HLT = 0b00000001;
 
 /**
  * Class for simulating a simple Computer (CPU & memory)
@@ -97,6 +101,20 @@ class CPU {
         this.reg[operandA] = operandB;
         this.PC += 3; // Next instruction
         console.log(this.reg[operandA]);
+        break;
+
+      // PRN is a pseudo-instruction that prints the numeric value stored within a register
+      case PRN:
+        // Retrieve the value of the register
+        console.log(this.reg[operandA]);
+        this.PC += 2; // the machine code is two bytes
+        break;
+
+      // HLT - halt the CPU (and exit the emulator)
+      case HLT:
+        // stop the process
+        this.stopClock();
+        this.PC += 1; // HLT machine is 1 byte however no next instructions due to emulation end
         break;
 
       default:
