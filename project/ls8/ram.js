@@ -3,6 +3,7 @@
  */
 class RAM {
   constructor(size) {
+    // RAM will be called with a size like new Ram(256) as an array
     this.mem = new Array(size);
     this.mem.fill(0);
   }
