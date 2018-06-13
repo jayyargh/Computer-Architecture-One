@@ -2,6 +2,10 @@
  * LS-8 v2.0 emulator skeleton code
  */
 
+// must use 0b in front of binary numbers
+// LDI register immediate
+const LDI = 0b10011001;
+
 /**
  * Class for simulating a simple Computer (CPU & memory)
  */
@@ -78,12 +82,28 @@ class CPU {
     // Get the two bytes in memory _after_ the PC in case the instruction
     // needs them.
 
-    // !!! IMPLEMENT ME
+    // get the next two bytes after the PC
+    const operandA = this.ram.read(this.PC + 1);
+    const operandB = this.ram.read(this.PC + 2);
 
     // Execute the instruction. Perform the actions for the instruction as
     // outlined in the LS-8 spec.
 
     // !!! IMPLEMENT ME
+    switch (IR) {
+      // LDI sets the value of a register to an integer
+      case LDI:
+        // Set the value in a register
+        this.reg[operandA] = operandB;
+        this.PC += 3; // Next instruction
+        console.log(this.reg[operandA]);
+        break;
+
+      default:
+        console.log('Unknown instruction: ' + IR.toString(2));
+        this.stopClock();
+        return;
+    }
 
     // Increment the PC register to go to the next instruction. Instructions
     // can be 1, 2, or 3 bytes long. Hint: the high 2 bits of the
