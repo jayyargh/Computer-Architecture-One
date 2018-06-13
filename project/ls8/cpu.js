@@ -3,12 +3,14 @@
  */
 
 // must use 0b in front of binary numbers
-// LDI register immediate
+// LDI - register immediate
 const LDI = 0b10011001;
 // PRN register - pseudo instruction
 const PRN = 0b01000011;
 // HLT - halt the CPU (and exit the emulator)
 const HLT = 0b00000001;
+// MUL - multiplies two registers together and stores result in A
+const MUL = 0b10101010;
 
 /**
  * Class for simulating a simple Computer (CPU & memory)
