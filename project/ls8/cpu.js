@@ -11,6 +11,34 @@ const PRN = 0b01000011;
 const HLT = 0b00000001;
 // MUL - multiplies two registers together and stores result in A
 const MUL = 0b10101010;
+// adds two registers and stores in regA
+const ADD = 0b10101000;
+// bitwise-AND regA and regB, then store the result in regA
+const AND = 0b10110011;
+// calls a subroutine (function) at the address stored in register
+const CALL = 0b01001000;
+// compares values in two registers
+/** If they are equal, set the Equal E flag to 1, otherwise set it to 0.
+ * If registerA is less than registerB, set the Less-than L flag to 1, otherwise set it to 0.
+ * If registerA is greater than registerB, set the Greater-than G flag to 1, otherwise set it to 0.
+ */
+const CMP = 0b10100000;
+// decrement (subtract 1 from) the value in given register
+const DEC = 0b01111001;
+// divide value A by value B, store in regA
+const DIV = 0b10101011;
+// increment (add 1 to) the value in given register
+const INC = 0b01111000;
+// interrupt number stored in given register
+const INT = 0b01001010;
+// return from interrupt handler
+/**
+ * Registers R6-R0 are popped off the stack in that order.
+ * The FL register is popped off the stack.
+ * The return address is popped off the stack and stored in PC.
+ * Interrupts are re-enabled
+ */
+const IRET = 0b00001011;
 
 /**
  * Class for simulating a simple Computer (CPU & memory)
@@ -65,7 +93,10 @@ class CPU {
   alu(op, regA, regB) {
     switch (op) {
       case 'MUL':
-        // !!! IMPLEMENT ME
+        // access the registers and multiply together
+        // this.reg[regA] *= this.reg[regB];
+        // 0xff prevents anything over 255 bits
+        this.reg[regA] = (this.reg[regB] * this.reg[regA]) & 0xff;
         break;
     }
   }
@@ -112,6 +143,12 @@ class CPU {
         this.PC += 2; // the machine code is two bytes
         break;
 
+      // MUL will multiply two registers together using ALU
+      case MUL:
+        // access ALU method 'MUL'
+        this.alu('MUL', operandA, operandB);
+        break;
+
       // HLT - halt the CPU (and exit the emulator)
       case HLT:
         // stop the process
@@ -131,6 +168,8 @@ class CPU {
     // for any particular instruction.
 
     // !!! IMPLEMENT ME
+    const instLen = (IR >> 6) + 1;
+    this.PC += instLen;
   }
 }
 
