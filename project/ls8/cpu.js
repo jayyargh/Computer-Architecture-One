@@ -49,12 +49,11 @@ class CPU {
    */
   constructor(ram) {
     this.ram = ram;
-
     // creates 8 bit ram with 8 registers and fills with 0's
     this.reg = new Array(8).fill(0); // General-purpose registers R0-R7
-
     // Special-purpose registers
     this.PC = 0; // Program Counter
+    this.SP = 7; // stack pointer
   }
 
   /**
@@ -154,6 +153,11 @@ class CPU {
         this.stopClock();
         this.PC += 1; // HLT machine is 1 byte however no next instructions due to emulation end
         break;
+
+      // case PUSH:
+      //   this.reg[SP]--;
+      //   this.ram.write(this.reg[SP], this.reg[operandA]);
+      //   break;
 
       default:
         console.log('Unknown instruction: ' + IR.toString(2));

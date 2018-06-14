@@ -2,6 +2,7 @@
 const fs = require('fs');
 const RAM = require('./ram');
 const CPU = require('./cpu');
+const filename = process.argv[2];
 
 /**
  * Load an LS8 program into memory
@@ -16,6 +17,7 @@ function loadMemory(filename) {
   const lines = content.trim().split(/[\r\n]+/g);
 
   program = [];
+  console.log(program);
 
   for (let line of lines) {
     // parsing as binary number
@@ -50,7 +52,6 @@ let cpu = new CPU(ram);
 
 // TODO: get name of ls8 file to load from command line
 
-// process.argv[2] = filename
-loadMemory(cpu, process.argv[2]);
+loadMemory(filename);
 
 cpu.startClock();
