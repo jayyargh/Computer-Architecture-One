@@ -114,12 +114,12 @@ class CPU {
     const IR = this.ram.read(this.PC);
 
     // Debugging output
-    console.log(`${this.PC}: ${IR.toString(2)}`);
+    // console.log(`${this.PC}: ${IR.toString(2)}`);
 
     // Get the two bytes in memory _after_ the PC in case the instruction
     // needs them.
 
-    // get the next two bytes after the PC
+    // get the next two bytes after the PC to check for instructions
     const operandA = this.ram.read(this.PC + 1);
     const operandB = this.ram.read(this.PC + 2);
 
@@ -132,15 +132,14 @@ class CPU {
       case LDI:
         // Set the value in a register
         this.reg[operandA] = operandB;
-        this.PC += 3; // Next instruction
-        console.log(this.reg[operandA]);
+        // this.PC += 3; // Next instruction
         break;
 
       // PRN is a pseudo-instruction that prints the numeric value stored within a register
       case PRN:
         // Retrieve the value of the register
         console.log(this.reg[operandA]);
-        this.PC += 2; // the machine code is two bytes
+        // this.PC += 2; // the machine code is two bytes
         break;
 
       // MUL will multiply two registers together using ALU

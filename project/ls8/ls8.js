@@ -1,3 +1,5 @@
+// add fs to read commands from command line to read/write/open files
+const fs = require('fs');
 const RAM = require('./ram');
 const CPU = require('./cpu');
 
@@ -6,24 +8,25 @@ const CPU = require('./cpu');
  *
  * TODO: load this from a file on disk instead of having it hardcoded
  */
-function loadMemory() {
+function loadMemory(filename) {
   // Hardcoded program to print the number 8 on the console
 
-  const program = [
-    // print8.ls8
-    '10011001', // LDI R0,8  Store 8 into R0
-    '00000000',
-    '00001000',
-    '10011001',
-    '00000001',
-    '00001001',
-    '10101010', // MUL R0, R1
-    '00000000',
-    '00000001',
-    '01000011', // PRN R0    Print the value in R0
-    '00000000',
-    '00000001' // HLT       Halt and quit
-  ];
+  const content = fs.readFileSync(filename, 'utf-8');
+
+  const lines = content.trim().split(/[\r\n]+/g);
+
+  program = [];
+
+  for (let line of lines) {
+    // parsing as binary number
+    const val = parseInt(line, 2);
+    // if it is not a number, skip
+    if (isNaN(val)) {
+      continue;
+    }
+    // otherwise push to program array
+    program.push(val);
+  }
 
   // Load the program into the CPU's memory a byte at a time
   for (let i = 0; i < program.length; i++) {
@@ -34,12 +37,20 @@ function loadMemory() {
 /**
  * Main
  */
+// check to make sure user properly entered `node ls8 <filename>`
+if (process.argv.length != 3) {
+  console.error(
+    'Please enter the correct ls8 filename in this format: node ls8 <filename>'
+  );
+  process.exit(1);
+}
 
 let ram = new RAM(256);
 let cpu = new CPU(ram);
 
 // TODO: get name of ls8 file to load from command line
 
-loadMemory(cpu);
+// process.argv[2] = filename
+loadMemory(cpu, process.argv[2]);
 
 cpu.startClock();
