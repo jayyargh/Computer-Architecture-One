@@ -4,41 +4,52 @@
 
 // must use 0b in front of binary numbers
 // LDI - register immediate
-const LDI = 0b10011001;
-// PRN register - pseudo instruction
-const PRN = 0b01000011;
-// HLT - halt the CPU (and exit the emulator)
-const HLT = 0b00000001;
-// MUL - multiplies two registers together and stores result in A
-const MUL = 0b10101010;
-// adds two registers and stores in regA
-const ADD = 0b10101000;
-// bitwise-AND regA and regB, then store the result in regA
-const AND = 0b10110011;
-// calls a subroutine (function) at the address stored in register
-const CALL = 0b01001000;
-// compares values in two registers
-/** If they are equal, set the Equal E flag to 1, otherwise set it to 0.
- * If registerA is less than registerB, set the Less-than L flag to 1, otherwise set it to 0.
- * If registerA is greater than registerB, set the Greater-than G flag to 1, otherwise set it to 0.
- */
-const CMP = 0b10100000;
-// decrement (subtract 1 from) the value in given register
-const DEC = 0b01111001;
-// divide value A by value B, store in regA
-const DIV = 0b10101011;
-// increment (add 1 to) the value in given register
-const INC = 0b01111000;
-// interrupt number stored in given register
-const INT = 0b01001010;
-// return from interrupt handler
-/**
- * Registers R6-R0 are popped off the stack in that order.
- * The FL register is popped off the stack.
- * The return address is popped off the stack and stored in PC.
- * Interrupts are re-enabled
- */
-const IRET = 0b00001011;
+(LDI = 0b10011001),
+  // PRN register - pseudo instruction
+  (PRN = 0b01000011),
+  // HLT - halt the CPU (and exit the emulator)
+  (HLT = 0b00000001),
+  // MUL - multiplies two registers together and stores result in A
+  (MUL = 0b10101010),
+  // adds two registers and stores in regA
+  (ADD = 0b10101000),
+  // bitwise-AND regA and regB, then store the result in regA
+  (AND = 0b10110011),
+  // calls a subroutine (function) at the address stored in register
+  (CALL = 0b01001000),
+  // compares values in two registers
+  /** If they are equal, set the Equal E flag to 1, otherwise set it to 0.
+   * If registerA is less than registerB, set the Less-than L flag to 1, otherwise set it to 0.
+   * If registerA is greater than registerB, set the Greater-than G flag to 1, otherwise set it to 0.
+   */
+  (CMP = 0b10100000),
+  // decrement (subtract 1 from) the value in given register
+  (DEC = 0b01111001),
+  // divide value A by value B, store in regA
+  (DIV = 0b10101011),
+  // increment (add 1 to) the value in given register
+  (INC = 0b01111000),
+  // interrupt number stored in given register
+  (INT = 0b01001010),
+  // return from interrupt handler
+  /**
+   * Registers R6-R0 are popped off the stack in that order.
+   * The FL register is popped off the stack.
+   * The return address is popped off the stack and stored in PC.
+   * Interrupts are re-enabled
+   */
+  (IRET = 0b00001011),
+  (JEQ = 0b01010001),
+  (JNE = 0b01010010),
+  (JMP = 0b0101);
+
+const FLAG_EQUAL = 0;
+const FLAG_GREATER = 1;
+const FLAG_LESS = 2;
+
+const SP = 7;
+const IS = 6;
+const IM = 5;
 
 /**
  * Class for simulating a simple Computer (CPU & memory)
@@ -53,7 +64,8 @@ class CPU {
     this.reg = new Array(8).fill(0); // General-purpose registers R0-R7
     // Special-purpose registers
     this.PC = 0; // Program Counter
-    this.SP = 7; // stack pointer
+    this.FL = 0;
+    this.reg[SP] = 0xf4; // stack pointer
   }
 
   /**
@@ -95,8 +107,15 @@ class CPU {
         // access the registers and multiply together
         // this.reg[regA] *= this.reg[regB];
         // 0xff prevents anything over 255 bits
-        this.reg[regA] = (this.reg[regB] * this.reg[regA]) & 0xff;
+        this.reg[regA] *= this.reg[regB] & 0xff;
         break;
+
+      case 'CMP':
+        this.compare(regA, regB);
+        break;
+
+      default:
+        console.log(`Error`);
     }
   }
 
@@ -158,6 +177,21 @@ class CPU {
       //   this.ram.write(this.reg[SP], this.reg[operandA]);
       //   break;
 
+      case JMP:
+        this.PC = this.reg[operandA]; // set PC to address set in reg
+        break;
+
+      case CMP:
+        this.alu('CMP', operandA, operandB);
+        break;
+
+      case JEQ:
+        if (this.getFlag(FLAG_EQUAL)) {
+          this.PC = this.reg[operandA];
+          incrementPC = false;
+        }
+        break;
+
       default:
         console.log('Unknown instruction: ' + IR.toString(2));
         this.stopClock();
@@ -172,6 +206,12 @@ class CPU {
     // !!! IMPLEMENT ME
     const instLen = (IR >> 6) + 1;
     this.PC += instLen;
+  }
+
+  compare(regA, regB) {
+    const equal = +(this.reg[regA] === this.reg[regB]);
+    const greater = +(this.reg[regA] > this.reg[regB]);
+    const less = +(this.reg[regA] < this.reg[regB]);
   }
 }
 

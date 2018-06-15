@@ -9,15 +9,13 @@ const filename = process.argv[2];
  *
  * TODO: load this from a file on disk instead of having it hardcoded
  */
-function loadMemory(filename) {
+function loadMemory(cpu, filename) {
   // Hardcoded program to print the number 8 on the console
 
   const content = fs.readFileSync(filename, 'utf-8');
-
   const lines = content.trim().split(/[\r\n]+/g);
 
   program = [];
-  console.log(program);
 
   for (let line of lines) {
     // parsing as binary number
@@ -52,6 +50,6 @@ let cpu = new CPU(ram);
 
 // TODO: get name of ls8 file to load from command line
 
-loadMemory(filename);
+loadMemory(cpu, filename);
 
 cpu.startClock();
