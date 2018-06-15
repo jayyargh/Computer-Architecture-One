@@ -151,7 +151,6 @@ class CPU {
       case HLT:
         // stop the process
         this.stopClock();
-        this.PC += 1; // HLT machine is 1 byte however no next instructions due to emulation end
         break;
 
       // case PUSH:
